@@ -1,1633 +1,796 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VAJAR INTEL SYSTEM | thecyberindia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --blue: #0af;
-      --red: #ff2244;
-      --cyan: #00ffe7;
-      --dark: #050a0f;
-      --darker: #020508;
-      --card: rgba(0,20,40,0.7);
-      --border-blue: rgba(0,170,255,0.3);
-      --border-red: rgba(255,34,68,0.3);
-      --text: #b8d4e8;
-      --white: #e8f4ff;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--darker);
-      color: var(--text);
-      font-family: 'Rajdhani', sans-serif;
-      overflow-x: hidden;
-      cursor: default;
-    }
-
-    /* SCANLINE OVERLAY */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.15) 2px,
-        rgba(0,0,0,0.15) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* GRID BG */
-    .grid-bg {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,170,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,170,255,0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 3rem;
-      background: rgba(2,5,8,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-blue);
-    }
-
-    .nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 900;
-      color: var(--blue);
-      letter-spacing: 2px;
-    }
-
-    .nav-logo span { color: var(--red); }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--cyan); }
-
-    .nav-badge {
-      background: var(--red);
-      color: #fff;
-      font-size: 0.65rem;
-      font-family: 'Orbitron', sans-serif;
-      padding: 0.3rem 0.8rem;
-      border-radius: 2px;
-      letter-spacing: 1px;
-      animation: pulse-red 2s infinite;
-    }
-
-    @keyframes pulse-red {
-      0%, 100% { box-shadow: 0 0 6px var(--red); }
-      50% { box-shadow: 0 0 20px var(--red), 0 0 40px rgba(255,34,68,0.3); }
-    }
-
-    /* HERO */
-    #hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 6rem 2rem 4rem;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .hero-glow {
-      position: absolute;
-      width: 800px; height: 800px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,170,255,0.08) 0%, transparent 70%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .hero-glow-red {
-      position: absolute;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,34,68,0.06) 0%, transparent 70%);
-      top: 60%; left: 30%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .status-bar {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(0,255,0,0.07);
-      border: 1px solid rgba(0,255,0,0.2);
-      border-radius: 2px;
-      padding: 0.4rem 1rem;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem;
-      color: #00ff88;
-      margin-bottom: 2rem;
-      animation: fadeInDown 1s ease both;
-    }
-
-    .dot {
-      width: 6px; height: 6px;
-      background: #00ff88;
-      border-radius: 50%;
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    .hero-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(2.5rem, 6vw, 5.5rem);
-      font-weight: 900;
-      line-height: 1;
-      color: var(--white);
-      letter-spacing: 4px;
-      animation: fadeInUp 1s ease 0.2s both;
-    }
-
-    .hero-title .v { color: var(--blue); text-shadow: 0 0 30px var(--blue); }
-    .hero-title .j { color: var(--red); text-shadow: 0 0 30px var(--red); }
-
-    .hero-sub {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: clamp(1rem, 2vw, 1.4rem);
-      color: rgba(184,212,232,0.7);
-      margin-top: 1.2rem;
-      font-weight: 400;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      animation: fadeInUp 1s ease 0.4s both;
-    }
-
-    .hero-tagline {
-      margin-top: 2rem;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 1.1rem;
-      color: var(--cyan);
-      animation: fadeInUp 1s ease 0.6s both;
-    }
-
-    .hero-tagline::before { content: '> '; color: var(--red); }
-
-    .hero-btns {
-      display: flex;
-      gap: 1.2rem;
-      margin-top: 2.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      animation: fadeInUp 1s ease 0.8s both;
-    }
-
-    .btn-primary {
-      background: var(--red);
-      color: #fff;
-      border: none;
-      padding: 0.9rem 2rem;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      cursor: pointer;
-      clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-      transition: all 0.2s;
-    }
-
-    .btn-primary:hover {
-      background: #ff4466;
-      box-shadow: 0 0 30px rgba(255,34,68,0.6);
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--blue);
-      border: 1px solid var(--blue);
-      padding: 0.9rem 2rem;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      cursor: pointer;
-      clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0,170,255,0.1);
-      box-shadow: 0 0 30px rgba(0,170,255,0.4);
-      transform: translateY(-2px);
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 3rem;
-      margin-top: 4rem;
-      animation: fadeInUp 1s ease 1s both;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-num {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--blue);
-      text-shadow: 0 0 20px rgba(0,170,255,0.5);
-    }
-
-    .stat-label {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      color: rgba(184,212,232,0.5);
-      text-transform: uppercase;
-    }
-
-    /* TICKER */
-    .ticker {
-      background: rgba(255,34,68,0.1);
-      border-top: 1px solid var(--border-red);
-      border-bottom: 1px solid var(--border-red);
-      padding: 0.6rem 0;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ticker-inner {
-      display: flex;
-      animation: ticker 30s linear infinite;
-      white-space: nowrap;
-    }
-
-    .ticker-item {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--red);
-      padding: 0 3rem;
-      letter-spacing: 1px;
-    }
-
-    .ticker-item::before { content: '◆ '; }
-
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-
-    /* SECTION BASE */
-    section {
-      position: relative;
-      z-index: 1;
-      padding: 6rem 4rem;
-    }
-
-    .section-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--red);
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: 2px;
-      margin-bottom: 1rem;
-    }
-
-    .section-title span { color: var(--blue); }
-
-    .section-divider {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--blue), var(--red));
-      margin-bottom: 3rem;
-    }
-
-    /* PRODUCTS */
-    #products {
-      background: rgba(0,10,20,0.5);
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .product-card {
-      background: var(--card);
-      border: 1px solid;
-      padding: 2.5rem;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .product-card:hover {
-      transform: translateY(-6px);
-    }
-
-    .product-card.blue { border-color: var(--border-blue); }
-    .product-card.blue:hover { box-shadow: 0 0 40px rgba(0,170,255,0.2); }
-
-    .product-card.red { border-color: var(--border-red); }
-    .product-card.red:hover { box-shadow: 0 0 40px rgba(255,34,68,0.2); }
-
-    .product-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 2px;
-    }
-
-    .product-card.blue::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
-    .product-card.red::before { background: linear-gradient(90deg, transparent, var(--red), transparent); }
-
-    .card-corner {
-      position: absolute;
-      top: 0; right: 0;
-      width: 60px; height: 60px;
-      overflow: hidden;
-    }
-
-    .card-corner::before {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      border-style: solid;
-      border-width: 0 60px 60px 0;
-    }
-
-    .product-card.blue .card-corner::before { border-color: transparent rgba(0,170,255,0.15) transparent transparent; }
-    .product-card.red .card-corner::before { border-color: transparent rgba(255,34,68,0.15) transparent transparent; }
-
-    .product-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .product-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      letter-spacing: 2px;
-    }
-
-    .product-card.blue .product-name { color: var(--blue); }
-    .product-card.red .product-name { color: var(--red); }
-
-    .product-desc {
-      font-size: 0.85rem;
-      color: rgba(184,212,232,0.6);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .feature-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-
-    .feature-list li {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    .feat-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .product-card.blue .feat-dot { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
-    .product-card.red .feat-dot { background: var(--red); box-shadow: 0 0 6px var(--red); }
-
-    /* PROBLEM/SOLUTION */
-    #why {
-      background: linear-gradient(180deg, var(--darker) 0%, rgba(0,10,20,0.8) 100%);
-    }
-
-    .why-grid {
-      display: grid;
-      grid-template-columns: 1fr 60px 1fr;
-      gap: 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      align-items: center;
-    }
-
-    .why-card {
-      background: var(--card);
-      border: 1px solid;
-      padding: 2rem;
-      border-radius: 2px;
-    }
-
-    .why-card.prob { border-color: var(--border-red); }
-    .why-card.sol { border-color: rgba(0,255,136,0.3); }
-
-    .why-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 3px;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .why-card.prob .why-title { color: var(--red); }
-    .why-card.sol .why-title { color: #00ff88; }
-
-    .why-items {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
-    .why-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.8rem;
-      font-size: 1rem;
-      font-weight: 500;
-      line-height: 1.4;
-    }
-
-    .vs-divider {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--white);
-      text-align: center;
-      text-shadow: 0 0 20px var(--blue);
-    }
-
-    /* HOW IT WORKS */
-    #howitworks {
-      background: rgba(0,5,12,0.9);
-    }
-
-    .steps-container {
-      max-width: 900px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .steps-line {
-      position: absolute;
-      left: 30px;
-      top: 30px;
-      bottom: 30px;
-      width: 1px;
-      background: linear-gradient(180deg, var(--blue), var(--red), var(--blue));
-    }
-
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 2rem;
-      margin-bottom: 2.5rem;
-      padding-left: 1rem;
-      opacity: 0;
-      transform: translateX(-30px);
-      transition: all 0.6s ease;
-    }
-
-    .step.visible {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .step-num {
-      width: 60px;
-      height: 60px;
-      background: var(--darker);
-      border: 1px solid var(--border-blue);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--blue);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .step-content {
-      padding-top: 0.8rem;
-    }
-
-    .step-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: 2px;
-      margin-bottom: 0.3rem;
-    }
-
-    .step-desc {
-      font-size: 0.9rem;
-      color: rgba(184,212,232,0.6);
-      line-height: 1.5;
-    }
-
-    /* FEATURES */
-    #features {
-      background: rgba(0,10,20,0.6);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .feature-card {
-      background: rgba(0,15,30,0.8);
-      border: 1px solid var(--border-blue);
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s;
-    }
-
-    .feature-card:hover {
-      border-color: var(--blue);
-      box-shadow: 0 0 20px rgba(0,170,255,0.15);
-      transform: translateY(-4px);
-    }
-
-    .feature-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 0; height: 1px;
-      background: var(--cyan);
-      transition: width 0.4s;
-    }
-
-    .feature-card:hover::after { width: 100%; }
-
-    .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-
-    .feature-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--blue);
-      letter-spacing: 2px;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-    }
-
-    .feature-desc {
-      font-size: 0.85rem;
-      color: rgba(184,212,232,0.55);
-      line-height: 1.5;
-    }
-
-    /* USE CASES */
-    #usecases {
-      background: var(--darker);
-    }
-
-    .usecases-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 1rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .usecase-card {
-      background: rgba(0,15,30,0.7);
-      border: 1px solid var(--border-red);
-      padding: 1.5rem 1rem;
-      text-align: center;
-      transition: all 0.3s;
-    }
-
-    .usecase-card:hover {
-      border-color: var(--red);
-      box-shadow: 0 0 20px rgba(255,34,68,0.15);
-    }
-
-    .usecase-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-
-    .usecase-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: 1px;
-      line-height: 1.3;
-    }
-
-    /* SOCIAL PROOF */
-    #social {
-      background: rgba(0,8,16,0.9);
-    }
-
-    .social-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .social-card {
-      background: var(--card);
-      border: 1px solid var(--border-blue);
-      padding: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      transition: all 0.3s;
-      text-decoration: none;
-    }
-
-    .social-card:hover {
-      border-color: var(--blue);
-      box-shadow: 0 0 30px rgba(0,170,255,0.15);
-    }
-
-    .social-icon { font-size: 3rem; }
-
-    .social-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      color: var(--white);
-      margin-bottom: 0.3rem;
-    }
-
-    .social-handle {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--blue);
-    }
-
-    .social-sub {
-      font-size: 0.8rem;
-      color: rgba(184,212,232,0.5);
-      margin-top: 0.3rem;
-    }
-
-    /* ABOUT / CREDENTIALS */
-    #credentials {
-      background: rgba(0,5,12,0.9);
-    }
-
-    .cred-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      align-items: start;
-    }
-
-    .cred-left { }
-
-    .cred-bio {
-      font-size: 1rem;
-      line-height: 1.8;
-      color: rgba(184,212,232,0.7);
-      margin-bottom: 1.5rem;
-    }
-
-    .cred-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      color: var(--blue);
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-
-    .cred-role {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--red);
-      letter-spacing: 2px;
-    }
-
-    .certs {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
-    .cert-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: rgba(0,170,255,0.05);
-      border: 1px solid var(--border-blue);
-      padding: 0.8rem 1rem;
-    }
-
-    .cert-badge {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.6rem;
-      font-weight: 700;
-      background: var(--blue);
-      color: var(--darker);
-      padding: 0.2rem 0.5rem;
-      flex-shrink: 0;
-    }
-
-    .cert-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--white);
-    }
-
-    .cert-org {
-      font-size: 0.75rem;
-      color: rgba(184,212,232,0.5);
-    }
-
-    /* CONTACT */
-    #contact {
-      background: rgba(0,10,20,0.8);
-    }
-
-    .contact-wrapper {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .contact-warning {
-      background: rgba(255,34,68,0.08);
-      border: 1px solid var(--border-red);
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2.5rem;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--red);
-    }
-
-    .contact-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--blue);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .form-input, .form-select, .form-textarea {
-      background: rgba(0,20,40,0.8);
-      border: 1px solid var(--border-blue);
-      padding: 0.8rem 1rem;
-      color: var(--white);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 10px rgba(0,170,255,0.1);
-    }
-
-    .form-select option { background: #050a0f; }
-
-    .form-textarea { resize: vertical; min-height: 100px; }
-
-    .form-submit {
-      background: linear-gradient(90deg, var(--red), #cc001a);
-      color: #fff;
-      border: none;
-      padding: 1rem;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 3px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .form-submit::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      transition: left 0.4s;
-    }
-
-    .form-submit:hover::before { left: 100%; }
-    .form-submit:hover { box-shadow: 0 0 30px rgba(255,34,68,0.5); }
-
-    /* FOOTER */
-    footer {
-      background: rgba(0,3,6,0.95);
-      border-top: 1px solid var(--border-blue);
-      padding: 3rem 4rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
-      gap: 3rem;
-      max-width: 1100px;
-      margin: 0 auto 3rem;
-    }
-
-    .footer-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--blue);
-      letter-spacing: 3px;
-      margin-bottom: 1rem;
-    }
-
-    .footer-logo span { color: var(--red); }
-
-    .footer-bio {
-      font-size: 0.85rem;
-      color: rgba(184,212,232,0.45);
-      line-height: 1.7;
-    }
-
-    .footer-col-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 3px;
-      color: var(--blue);
-      margin-bottom: 1rem;
-    }
-
-    .footer-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .footer-links a {
-      font-size: 0.85rem;
-      color: rgba(184,212,232,0.5);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover { color: var(--blue); }
-
-    .footer-bottom {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(0,170,255,0.1);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      color: rgba(184,212,232,0.3);
-    }
-
-    /* ANIMATIONS */
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* SCROLL REVEAL */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.7s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* TERMINAL TYPING */
-    .typing-container {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--cyan);
-      background: rgba(0,20,40,0.5);
-      border: 1px solid var(--border-blue);
-      padding: 1.5rem;
-      margin-top: 2.5rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .typing-line {
-      margin-bottom: 0.4rem;
-    }
-
-    .typing-line::before { content: '$ '; color: var(--red); }
-    .typing-line.output { color: #00ff88; }
-    .typing-line.output::before { content: '  '; }
-
-    /* MOBILE */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      section { padding: 4rem 1.5rem; }
-      .products-grid { grid-template-columns: 1fr; }
-      .why-grid { grid-template-columns: 1fr; }
-      .vs-divider { display: none; }
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .usecases-grid { grid-template-columns: repeat(2, 1fr); }
-      .social-grid { grid-template-columns: 1fr; }
-      .cred-grid { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
-    }
-
-    /* GLITCH EFFECT */
-    @keyframes glitch {
-      0%, 90%, 100% { transform: translate(0); }
-      92% { transform: translate(-2px, 1px); }
-      94% { transform: translate(2px, -1px); }
-      96% { transform: translate(-1px, 2px); }
-      98% { transform: translate(1px, -2px); }
-    }
-
-    .hero-title:hover {
-      animation: glitch 0.4s ease;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>THE CYBER INDIA | VAJAR INTEL — Nation's Digital Shield</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --saffron:#FF9933;--saffron2:#e6821e;
+  --green:#138808;--green2:#0d6607;
+  --navy:#000080;--navyg:rgba(0,0,128,0.7);
+  --white:#f0f4ff;--dark:#04060a;--darker:#020408;
+  --card:rgba(4,8,16,0.85);--text:#c8d8e8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--darker);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px);pointer-events:none;z-index:9000;}
+
+.tricolor-top{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--saffron) 33.3%,#fff 33.3%,#fff 66.6%,var(--green) 66.6%);z-index:10001;}
+.gridbg{position:fixed;inset:0;background-image:linear-gradient(rgba(255,153,51,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(19,136,8,0.02) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:fixed;top:3px;left:0;right:0;z-index:5000;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 3rem;background:rgba(2,3,7,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,153,51,0.12);}
+.nl{display:flex;align-items:center;gap:0.8rem;}
+.nc{width:30px;height:30px;border:1.5px solid rgba(0,0,128,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:spinz 8s linear infinite;flex-shrink:0;}
+.nc svg{width:22px;height:22px;}
+@keyframes spinz{to{transform:rotate(360deg);}}
+.nb{font-family:'Orbitron',sans-serif;}
+.nb .nt{font-size:0.55rem;letter-spacing:6px;color:rgba(255,255,255,0.3);display:block;}
+.nb .nc2{color:var(--saffron);font-size:0.95rem;font-weight:900;letter-spacing:2px;}
+.nb .ni{color:var(--green);font-size:0.95rem;font-weight:900;letter-spacing:2px;}
+.nm{display:flex;gap:1.8rem;list-style:none;}
+.nm a{color:rgba(200,216,232,0.6);text-decoration:none;font-size:0.72rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color .2s;}
+.nm a:hover{color:var(--saffron);}
+.nbadge{background:linear-gradient(90deg,var(--saffron),var(--green));color:#fff;font-family:'Orbitron',sans-serif;font-size:0.52rem;font-weight:700;padding:.3rem .9rem;letter-spacing:2px;animation:glowbadge 2s alternate infinite;}
+@keyframes glowbadge{from{box-shadow:0 0 8px rgba(255,153,51,0.5);}to{box-shadow:0 0 20px rgba(19,136,8,0.5);}}
+
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 4rem;overflow:hidden;z-index:1;}
+.hg1{position:absolute;width:900px;height:500px;background:radial-gradient(ellipse,rgba(255,153,51,0.07) 0%,transparent 70%);top:15%;left:50%;transform:translateX(-50%);pointer-events:none;}
+.hg2{position:absolute;width:700px;height:400px;background:radial-gradient(ellipse,rgba(19,136,8,0.06) 0%,transparent 70%);bottom:5%;left:50%;transform:translateX(-50%);pointer-events:none;}
+.chakra-wm{position:absolute;width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spinz 25s linear infinite;pointer-events:none;opacity:0.05;}
+
+.heyebrow{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--saffron);letter-spacing:5px;margin-bottom:1.2rem;animation:fu .9s ease both;}
+.heyebrow span{color:var(--green);}
+.hmain{font-family:'Bebas Neue',sans-serif;line-height:.9;letter-spacing:5px;animation:fu .9s ease .1s both;position:relative;}
+.hmain .ht{font-size:clamp(1.8rem,5vw,4.5rem);color:rgba(255,255,255,0.28);letter-spacing:16px;display:block;margin-bottom:.05em;}
+.hmain .hc{font-size:clamp(4rem,13vw,12rem);color:var(--saffron);text-shadow:0 0 80px rgba(255,153,51,0.35),0 0 160px rgba(255,153,51,0.15);display:block;}
+.hmain .hi{font-size:clamp(4rem,13vw,12rem);color:var(--green);text-shadow:0 0 80px rgba(19,136,8,0.35),0 0 160px rgba(19,136,8,0.15);display:block;}
+.htool{font-family:'Orbitron',sans-serif;font-size:clamp(.75rem,1.5vw,1rem);color:rgba(200,216,232,0.45);letter-spacing:5px;margin-top:.8rem;animation:fu .9s ease .2s both;}
+.htool strong{color:var(--white);}
+.triline{width:220px;height:3px;margin:1.2rem auto;background:linear-gradient(90deg,var(--saffron) 33%,#fff 33%,#fff 66%,var(--green) 66%);animation:fu .9s ease .3s both;}
+.htag{font-family:'Rajdhani',sans-serif;font-size:clamp(1rem,2.2vw,1.4rem);color:rgba(200,216,232,0.65);animation:fu .9s ease .35s both;max-width:580px;}
+.hbtns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center;animation:fu .9s ease .5s both;}
+.bsaff{background:linear-gradient(135deg,var(--saffron),var(--saffron2));color:#fff;border:none;padding:.85rem 2.2rem;font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);transition:all .25s;}
+.bsaff:hover{box-shadow:0 0 40px rgba(255,153,51,.6);transform:translateY(-3px);}
+.bgreen{background:transparent;color:var(--green);border:1px solid var(--green);padding:.85rem 2.2rem;font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);transition:all .25s;}
+.bgreen:hover{background:rgba(19,136,8,.1);box-shadow:0 0 40px rgba(19,136,8,.4);transform:translateY(-3px);}
+
+.hterm{margin-top:2.5rem;background:rgba(2,5,12,.92);border:1px solid rgba(255,153,51,.18);border-top:2px solid var(--saffron);padding:1.5rem 2rem;max-width:560px;width:100%;text-align:left;font-family:'Share Tech Mono',monospace;font-size:.76rem;animation:fu .9s ease .7s both;position:relative;}
+.hterm::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--saffron),#fff,var(--green));}
+.tp{color:var(--saffron);}
+.to{color:#00ff88;display:block;margin-top:.3rem;}
+.tw{color:var(--saffron);display:block;margin-top:.3rem;}
+.csr{display:inline-block;width:7px;height:13px;background:var(--saffron);animation:blink 1s infinite;vertical-align:middle;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.hstats{display:flex;gap:2.5rem;margin-top:2.5rem;flex-wrap:wrap;justify-content:center;animation:fu .9s ease .9s both;}
+.si{text-align:center;}
+.sn{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--saffron),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sl{font-size:.62rem;letter-spacing:2px;color:rgba(200,216,232,.38);text-transform:uppercase;margin-top:.2rem;}
+
+@keyframes fu{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+/* TICKER */
+.ticker{position:relative;overflow:hidden;padding:.65rem 0;background:rgba(255,153,51,.05);border-top:1px solid rgba(255,153,51,.12);border-bottom:1px solid rgba(19,136,8,.12);z-index:1;}
+.ticker-i{display:flex;animation:tick 35s linear infinite;white-space:nowrap;}
+.ti{font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:0 2.5rem;letter-spacing:1px;}
+.ti.s{color:var(--saffron);}
+.ti.g{color:var(--green);}
+.ti.w{color:rgba(255,255,255,.4);}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:6rem 4rem;}
+.sl2{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--saffron);letter-spacing:4px;text-transform:uppercase;margin-bottom:.4rem;}
+.st{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4.5vw,4rem);color:var(--white);letter-spacing:3px;margin-bottom:.5rem;}
+.st span{color:var(--green);}
+.st span.s{color:var(--saffron);}
+.sdiv{width:90px;height:3px;margin-bottom:3rem;background:linear-gradient(90deg,var(--saffron),#fff,var(--green));}
+
+/* FOUNDER */
+#founder{background:rgba(0,4,10,.98);}
+.fl{display:grid;grid-template-columns:360px 1fr;gap:4rem;max-width:1100px;margin:0 auto;align-items:start;}
+.photocard{background:rgba(4,8,18,.9);border:1px solid rgba(255,153,51,.18);padding:2rem;position:relative;overflow:hidden;}
+.photocard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--saffron),#fff,var(--green));}
+.photocard::after{content:'✓ VERIFIED';position:absolute;top:1rem;right:1rem;background:var(--green);color:#fff;font-family:'Orbitron',monospace;font-size:.48rem;padding:.2rem .5rem;letter-spacing:1px;}
+
+.avwrap{width:200px;height:200px;margin:0 auto 1.5rem;position:relative;}
+.avring{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;background:linear-gradient(var(--darker),var(--darker)) padding-box,linear-gradient(135deg,var(--saffron),#fff,var(--green)) border-box;animation:spinz 6s linear infinite;}
+.avinner{position:absolute;inset:10px;border-radius:50%;background:linear-gradient(145deg,#08121e,#0c1a2c);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.avinner svg{width:100%;height:100%;}
+
+.fname{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:900;color:var(--white);text-align:center;letter-spacing:2px;}
+.frole{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--saffron);letter-spacing:2px;text-align:center;margin-top:.3rem;}
+.fsocial{display:flex;justify-content:center;gap:.7rem;margin-top:1.2rem;flex-wrap:wrap;}
+.sp{font-family:'Share Tech Mono',monospace;font-size:.62rem;padding:.28rem .65rem;border-radius:2px;letter-spacing:1px;text-decoration:none;transition:all .2s;}
+.sp.yt{background:rgba(255,0,0,.12);color:#ff4444;border:1px solid rgba(255,0,0,.2);}
+.sp.ig{background:rgba(255,153,51,.08);color:var(--saffron);border:1px solid rgba(255,153,51,.18);}
+.sp.gh{background:rgba(255,255,255,.04);color:#999;border:1px solid rgba(255,255,255,.08);}
+.sp:hover{transform:translateY(-2px);}
+.fcontact{margin-top:1.2rem;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:rgba(200,216,232,.35);line-height:2;text-align:center;}
+
+.fbio{font-size:1rem;line-height:1.8;color:rgba(200,216,232,.72);margin-bottom:1.2rem;}
+.fbio strong{color:var(--saffron);}
+
+.certlist{display:flex;flex-direction:column;gap:.65rem;}
+.crow{display:flex;align-items:center;gap:.9rem;background:rgba(255,153,51,.03);border:1px solid rgba(255,153,51,.1);padding:.65rem .9rem;transition:all .2s;}
+.crow:hover{border-color:rgba(255,153,51,.28);background:rgba(255,153,51,.06);}
+.ctag{font-family:'Orbitron',sans-serif;font-size:.5rem;font-weight:700;background:linear-gradient(135deg,var(--saffron),var(--saffron2));color:#fff;padding:.2rem .45rem;white-space:nowrap;flex-shrink:0;}
+.cname{font-size:.88rem;font-weight:600;color:var(--white);}
+.corg{font-size:.72rem;color:rgba(200,216,232,.4);}
+
+/* PRODUCTS */
+#products{background:rgba(2,5,12,.98);}
+.pduo{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;max-width:1100px;margin:0 auto;}
+.pc{background:rgba(3,7,16,.92);border:1px solid rgba(255,153,51,.12);position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;}
+.pc:hover{transform:translateY(-8px);}
+.pc.gc{border-color:rgba(19,136,8,.15);}
+.pc.gc:hover{box-shadow:0 20px 60px rgba(19,136,8,.12);}
+.pc:not(.gc):hover{box-shadow:0 20px 60px rgba(255,153,51,.12);}
+.pcstripe{height:3px;}
+.pc:not(.gc) .pcstripe{background:linear-gradient(90deg,var(--saffron),rgba(255,153,51,.1));}
+.pc.gc .pcstripe{background:linear-gradient(90deg,var(--green),rgba(19,136,8,.1));}
+.pcbody{padding:2.5rem;}
+
+.illus{width:100%;height:175px;display:flex;align-items:center;justify-content:center;background:rgba(0,4,10,.5);border:1px solid rgba(255,255,255,.03);margin-bottom:2rem;position:relative;overflow:hidden;}
+.illus::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 8px,rgba(255,153,51,.02) 8px,rgba(255,153,51,.02) 9px);}
+
+.bot{width:140px;height:150px;position:relative;}
+.bhead{position:absolute;top:0;left:50%;transform:translateX(-50%);width:62px;height:52px;background:linear-gradient(145deg,#0c1a2e,#071220);border:1px solid rgba(255,153,51,.4);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.beyes{display:flex;gap:12px;}
+.beye{width:10px;height:10px;border-radius:50%;background:var(--saffron);box-shadow:0 0 12px var(--saffron);animation:ep 2s infinite alternate;}
+.beye.b{background:var(--green);box-shadow:0 0 12px var(--green);animation-delay:.5s;}
+@keyframes ep{from{opacity:1;}to{opacity:.25;};}
+.bmouth{width:28px;height:2.5px;background:rgba(255,153,51,.5);border-radius:2px;}
+.bant{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:1.5px;height:18px;background:rgba(255,153,51,.6);}
+.bant::after{content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:var(--saffron);box-shadow:0 0 15px var(--saffron);animation:blink 1.2s infinite;}
+.bbody{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:78px;height:85px;background:linear-gradient(145deg,#0c1a2e,#071220);border:1px solid rgba(255,153,51,.3);border-radius:6px 6px 4px 4px;}
+.bdata{position:absolute;left:5px;top:30px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:rgba(255,153,51,.45);line-height:1.8;}
+.bsig{position:absolute;right:8px;top:20px;display:flex;flex-direction:column;gap:2px;align-items:flex-end;}
+.bs{background:var(--saffron);width:3px;border-radius:1px;}
+
+.ips{width:170px;height:155px;position:relative;}
+.ic1{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:138px;height:138px;border-radius:50%;border:1px dashed rgba(19,136,8,.4);animation:spinz 10s linear infinite;}
+.ic2{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:98px;height:98px;border-radius:50%;border:2px solid rgba(19,136,8,.25);}
+.ic3{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:rgba(19,136,8,.08);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--green);}
+.iddot{position:absolute;width:7px;height:7px;border-radius:50%;}
+.ipdata{position:absolute;right:0;top:10px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:rgba(19,136,8,.6);line-height:1.8;}
+
+.pname{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:900;letter-spacing:2px;margin-bottom:.4rem;}
+.pc:not(.gc) .pname{color:var(--saffron);}
+.pc.gc .pname{color:var(--green);}
+.ptag{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:rgba(200,216,232,.35);letter-spacing:1px;margin-bottom:1.1rem;}
+.pdesc{font-size:.93rem;line-height:1.7;color:rgba(200,216,232,.6);margin-bottom:1.4rem;}
+.plist{list-style:none;display:flex;flex-direction:column;gap:.52rem;}
+.plist li{display:flex;align-items:center;gap:.65rem;font-size:.9rem;font-weight:500;}
+.pb{width:5px;height:5px;flex-shrink:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.pc:not(.gc) .pb{background:var(--saffron);}
+.pc.gc .pb{background:var(--green);}
+
+/* WHY */
+#why{background:rgba(1,3,8,.99);}
+.wgrid{display:grid;grid-template-columns:1fr 50px 1fr;gap:2rem;max-width:960px;margin:0 auto;align-items:center;}
+.wcol{background:rgba(3,7,16,.85);padding:2.2rem;border:1px solid;}
+.wcol.prob{border-color:rgba(255,60,60,.18);}
+.wcol.sol{border-color:rgba(19,136,8,.2);}
+.whead{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:3px;margin-bottom:1.4rem;display:flex;align-items:center;gap:.5rem;}
+.wcol.prob .whead{color:#ff4444;}
+.wcol.sol .whead{color:var(--green);}
+.witems{display:flex;flex-direction:column;gap:.85rem;}
+.wi{display:flex;align-items:flex-start;gap:.75rem;font-size:.93rem;line-height:1.5;font-weight:500;}
+.vsm{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:rgba(255,255,255,.12);text-align:center;}
+
+/* HOW IT WORKS */
+#hiw{background:rgba(0,3,8,.97);}
+.swrap{max-width:830px;margin:0 auto;position:relative;}
+.strack{position:absolute;left:38px;top:40px;bottom:40px;width:2px;background:linear-gradient(180deg,var(--saffron),#fff 50%,var(--green));}
+.sitem{display:flex;gap:2rem;margin-bottom:2.3rem;opacity:0;transform:translateX(-20px);transition:all .6s ease;}
+.sitem.vis{opacity:1;transform:translateX(0);}
+.sno{width:76px;height:76px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;position:relative;z-index:1;clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);}
+.sitem:nth-child(odd) .sno{background:linear-gradient(135deg,rgba(255,153,51,.12),rgba(255,153,51,.04));color:var(--saffron);border:1px solid rgba(255,153,51,.28);}
+.sitem:nth-child(even) .sno{background:linear-gradient(135deg,rgba(19,136,8,.12),rgba(19,136,8,.04));color:var(--green);border:1px solid rgba(19,136,8,.28);}
+.scnt{padding-top:.9rem;}
+.stitle{font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700;color:var(--white);letter-spacing:2px;margin-bottom:.3rem;}
+.sdesc{font-size:.88rem;color:rgba(200,216,232,.5);line-height:1.6;}
+
+/* FEATURES */
+#features{background:rgba(3,5,12,.97);}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;max-width:1100px;margin:0 auto;}
+.fcard{background:rgba(3,7,16,.82);border:1px solid rgba(255,153,51,.07);padding:1.9rem;position:relative;overflow:hidden;transition:all .3s;cursor:default;}
+.fcard:hover{border-color:rgba(255,153,51,.28);background:rgba(255,153,51,.03);transform:translateY(-5px);}
+.fcard::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;transition:width .4s;}
+.fcard:hover::after{width:100%;}
+.fcard:nth-child(odd)::after{background:var(--saffron);}
+.fcard:nth-child(even)::after{background:var(--green);}
+.fic{font-size:2.1rem;margin-bottom:.9rem;}
+.fn{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:.45rem;}
+.fcard:nth-child(odd) .fn{color:var(--saffron);}
+.fcard:nth-child(even) .fn{color:var(--green);}
+.fd{font-size:.86rem;color:rgba(200,216,232,.48);line-height:1.6;}
+
+/* USE CASES */
+#usecases{background:rgba(0,2,7,.99);}
+.ucgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;max-width:1100px;margin:0 auto;}
+.uc{background:rgba(3,7,16,.72);border:1px solid rgba(19,136,8,.14);padding:1.7rem 1rem;text-align:center;transition:all .3s;}
+.uc:hover{border-color:var(--green);box-shadow:0 0 20px rgba(19,136,8,.13);transform:translateY(-5px);}
+.ucic{font-size:2rem;margin-bottom:.75rem;}
+.uct{font-family:'Rajdhani',sans-serif;font-size:.83rem;font-weight:700;color:var(--white);letter-spacing:1px;line-height:1.3;}
+
+/* MEDIA */
+#media{background:rgba(1,4,10,.97);}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:780px;margin:0 auto;}
+.mc{background:rgba(3,7,16,.88);border:1px solid rgba(255,153,51,.1);padding:2rem;display:flex;align-items:center;gap:1.5rem;text-decoration:none;color:inherit;transition:all .3s;position:relative;overflow:hidden;}
+.mc:hover{border-color:var(--saffron);transform:translateX(6px);}
+.mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--saffron),var(--green));}
+.mic{font-size:2.8rem;flex-shrink:0;}
+.mplt{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;color:var(--saffron);letter-spacing:2px;}
+.mhnd{font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--white);margin:.3rem 0;}
+.msub{font-size:.78rem;color:rgba(200,216,232,.38);}
+
+/* CONTACT */
+#contact{background:rgba(0,3,9,.99);}
+.cwrap{max-width:720px;margin:0 auto;}
+.cwarning{background:rgba(255,153,51,.04);border:1px solid rgba(255,153,51,.18);border-left:3px solid var(--saffron);padding:.95rem 1.4rem;display:flex;align-items:center;gap:.9rem;margin-bottom:2.2rem;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--saffron);line-height:1.6;}
+.cf{display:flex;flex-direction:column;gap:1.1rem;}
+.cfrow{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+.cfg{display:flex;flex-direction:column;gap:.38rem;}
+.cflbl{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--saffron);letter-spacing:2px;text-transform:uppercase;}
+.cfi,.cfs,.cft{background:rgba(3,9,18,.92);border:1px solid rgba(255,153,51,.13);padding:.8rem 1rem;color:var(--white);font-family:'Rajdhani',sans-serif;font-size:1rem;outline:none;transition:all .2s;border-radius:0;-webkit-appearance:none;appearance:none;}
+.cfi:focus,.cfs:focus,.cft:focus{border-color:var(--saffron);box-shadow:0 0 12px rgba(255,153,51,.07);}
+.cfs option{background:#04060a;}
+.cft{resize:vertical;min-height:95px;}
+.cfsub{background:linear-gradient(90deg,var(--saffron),var(--green));color:#fff;border:none;padding:1rem;font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:3px;cursor:pointer;position:relative;overflow:hidden;transition:all .25s;width:100%;}
+.cfsub:hover{box-shadow:0 0 35px rgba(255,153,51,.4);transform:translateY(-2px);}
+.cfsub::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .5s;}
+.cfsub:hover::before{left:100%;}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:rgba(3,8,16,.97);border:1px solid var(--green);border-left:4px solid var(--green);padding:1.2rem 1.8rem;max-width:340px;transform:translateX(120%);transition:transform .4s ease;}
+.toast.show{transform:translateX(0);}
+.toast-title{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--green);letter-spacing:2px;margin-bottom:.4rem;}
+.toast-msg{font-size:.88rem;color:rgba(200,216,232,.8);line-height:1.5;}
+
+/* FOOTER */
+footer{background:rgba(0,2,5,.99);border-top:1px solid rgba(255,153,51,.08);padding:3.5rem 4rem 2rem;position:relative;z-index:1;}
+.ftri{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--saffron) 33%,#fff 33%,#fff 66%,var(--green) 66%);}
+.finner{max-width:1100px;margin:0 auto;}
+.ftop{display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:4rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,153,51,.07);}
+.fblogo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;margin-bottom:.4rem;}
+.fblogo .ft{color:rgba(255,255,255,.25);font-size:.55em;display:block;letter-spacing:8px;}
+.fblogo .fc{color:var(--saffron);}
+.fblogo .fi{color:var(--green);}
+.fbtag{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:rgba(200,216,232,.3);line-height:2;margin-top:.4rem;}
+.fbcont{margin-top:1.1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:rgba(200,216,232,.35);line-height:2.2;}
+.fbcont a{color:var(--saffron);text-decoration:none;}
+.fch{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:3px;color:var(--saffron);margin-bottom:1.1rem;}
+.flinks{list-style:none;display:flex;flex-direction:column;gap:.55rem;}
+.flinks a{font-size:.86rem;color:rgba(200,216,232,.38);text-decoration:none;transition:color .2s;}
+.flinks a:hover{color:var(--green);}
+.fbot{display:flex;align-items:center;justify-content:space-between;padding-top:2rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:rgba(200,216,232,.2);flex-wrap:wrap;gap:.4rem;}
+.fbot .jai{color:var(--saffron);}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(22px);transition:all .7s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+/* MOBILE */
+@media(max-width:768px){
+  nav{padding:.75rem 1.2rem;}
+  .nm{display:none;}
+  section{padding:3.5rem 1.4rem;}
+  .pduo,.wgrid,.fl,.ftop,.mgrid,.cfrow{grid-template-columns:1fr;}
+  .vsm{display:none;}
+  .fgrid{grid-template-columns:1fr 1fr;}
+  .ucgrid{grid-template-columns:repeat(2,1fr);}
+  .hmain .ht{font-size:clamp(1.2rem,6vw,2.5rem);}
+  .hmain .hc,.hmain .hi{font-size:clamp(3.5rem,18vw,8rem);}
+}
+</style>
 </head>
 <body>
 
-  <div class="grid-bg"></div>
+<div class="tricolor-top"></div>
+<div class="gridbg"></div>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-logo">VAJAR<span>.</span>INTEL</div>
-    <ul class="nav-links">
-      <li><a href="#products">Tools</a></li>
-      <li><a href="#howitworks">How It Works</a></li>
-      <li><a href="#usecases">Use Cases</a></li>
-      <li><a href="#credentials">About</a></li>
-      <li><a href="#contact">Access</a></li>
-    </ul>
-    <div class="nav-badge">🔴 SYSTEM ONLINE</div>
-  </nav>
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-title">✅ REQUEST RECEIVED</div>
+  <div class="toast-msg">Your request has been sent via WhatsApp. Hariom Singh will contact you shortly. 🇮🇳</div>
+</div>
 
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-glow-red"></div>
-
-    <div class="status-bar">
-      <div class="dot"></div>
-      ACTIVE INTELLIGENCE FEED — CYBER THREAT LEVEL: ELEVATED
+<!-- NAV -->
+<nav>
+  <div class="nl">
+    <div class="nc">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="rgba(0,0,128,0.8)" stroke-width="2"/>
+        <circle cx="20" cy="20" r="4" fill="rgba(0,0,128,0.8)"/>
+        <line x1="20" y1="2" x2="20" y2="38" stroke="rgba(0,0,128,0.8)" stroke-width="1.2"/>
+        <line x1="2" y1="20" x2="38" y2="20" stroke="rgba(0,0,128,0.8)" stroke-width="1.2"/>
+        <line x1="7" y1="7" x2="33" y2="33" stroke="rgba(0,0,128,0.8)" stroke-width="1"/>
+        <line x1="33" y1="7" x2="7" y2="33" stroke="rgba(0,0,128,0.8)" stroke-width="1"/>
+        <line x1="4" y1="14" x2="36" y2="26" stroke="rgba(0,0,128,0.8)" stroke-width=".8"/>
+        <line x1="14" y1="4" x2="26" y2="36" stroke="rgba(0,0,128,0.8)" stroke-width=".8"/>
+        <line x1="36" y1="14" x2="4" y2="26" stroke="rgba(0,0,128,0.8)" stroke-width=".8"/>
+        <line x1="26" y1="4" x2="14" y2="36" stroke="rgba(0,0,128,0.8)" stroke-width=".8"/>
+      </svg>
     </div>
+    <div class="nb"><span class="nt">THE</span><span class="nc2">CYBER</span><span class="ni">INDIA</span></div>
+  </div>
+  <ul class="nm">
+    <li><a href="#products">Tools</a></li>
+    <li><a href="#hiw">How It Works</a></li>
+    <li><a href="#usecases">Use Cases</a></li>
+    <li><a href="#founder">About</a></li>
+    <li><a href="#contact">Access</a></li>
+  </ul>
+  <div class="nbadge">🇮🇳 INDIA'S CYBER INTEL</div>
+</nav>
 
-    <h1 class="hero-title">
-      <span class="v">V</span>AJAR&nbsp;<span class="j">I</span>NTEL
-    </h1>
-    <p class="hero-sub">AI-Powered Cybercrime Investigation System</p>
-    <p class="hero-tagline">From Data Breach to Criminal Trace — In Minutes, Not Days</p>
+<!-- HERO -->
+<section id="hero">
+  <div class="hg1"></div>
+  <div class="hg2"></div>
+  <svg class="chakra-wm" viewBox="0 0 500 500" fill="none">
+    <circle cx="250" cy="250" r="230" stroke="navy" stroke-width="6"/>
+    <circle cx="250" cy="250" r="200" stroke="navy" stroke-width="1" stroke-dasharray="4 4"/>
+    <circle cx="250" cy="250" r="22" fill="navy"/>
+    <line x1="250" y1="20" x2="250" y2="480" stroke="navy" stroke-width="2"/>
+    <line x1="20" y1="250" x2="480" y2="250" stroke="navy" stroke-width="2"/>
+    <line x1="95" y1="95" x2="405" y2="405" stroke="navy" stroke-width="1.5"/>
+    <line x1="405" y1="95" x2="95" y2="405" stroke="navy" stroke-width="1.5"/>
+    <line x1="60" y1="169" x2="440" y2="331" stroke="navy" stroke-width="1.2"/>
+    <line x1="169" y1="60" x2="331" y2="440" stroke="navy" stroke-width="1.2"/>
+    <line x1="440" y1="169" x2="60" y2="331" stroke="navy" stroke-width="1.2"/>
+    <line x1="331" y1="60" x2="169" y2="440" stroke="navy" stroke-width="1.2"/>
+    <line x1="44" y1="132" x2="456" y2="368" stroke="navy" stroke-width=".8"/>
+    <line x1="132" y1="44" x2="368" y2="456" stroke="navy" stroke-width=".8"/>
+    <line x1="456" y1="132" x2="44" y2="368" stroke="navy" stroke-width=".8"/>
+    <line x1="368" y1="44" x2="132" y2="456" stroke="navy" stroke-width=".8"/>
+    <line x1="36" y1="200" x2="464" y2="300" stroke="navy" stroke-width=".6"/>
+    <line x1="200" y1="36" x2="300" y2="464" stroke="navy" stroke-width=".6"/>
+    <line x1="464" y1="200" x2="36" y2="300" stroke="navy" stroke-width=".6"/>
+    <line x1="300" y1="36" x2="200" y2="464" stroke="navy" stroke-width=".6"/>
+  </svg>
 
-    <div class="hero-btns">
-      <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">🚀 REQUEST ACCESS</button>
-      <button class="btn-secondary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">🔍 VIEW TOOLS</button>
-    </div>
+  <div class="heyebrow">🇮🇳 INDIA'S DIGITAL SECURITY SHIELD &nbsp;·&nbsp; <span>JAI HIND</span></div>
 
-    <div class="typing-container">
-      <div class="typing-line">vajar-intel --query "+91XXXXXXXXXX"</div>
-      <div class="typing-line output">⚡ Analyzing target...</div>
-      <div class="typing-line output">✓ OSINT Profile: FOUND</div>
-      <div class="typing-line output">✓ IP Trace: 103.xx.xx.xx → Gorakhpur, UP</div>
-      <div class="typing-line output">✓ Threat Score: HIGH | VPN Exit Detected</div>
-      <div class="typing-line output">✓ Report Generated: case_2024_001.pdf</div>
-    </div>
-
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">2+</div>
-        <div class="stat-label">Intelligence Tools</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">∞</div>
-        <div class="stat-label">Faster than CDR</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">24/7</div>
-        <div class="stat-label">Always Active</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">LEA</div>
-        <div class="stat-label">Law Enforcement</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TICKER -->
-  <div class="ticker">
-    <div class="ticker-inner">
-      <span class="ticker-item">VAJAR-INTEL-BOT ACTIVE</span>
-      <span class="ticker-item">IP FORENSIC SYSTEM ONLINE</span>
-      <span class="ticker-item">OSINT ENGINE READY</span>
-      <span class="ticker-item">THREAT INTELLIGENCE FEED LIVE</span>
-      <span class="ticker-item">AUTHORIZED PERSONNEL ONLY</span>
-      <span class="ticker-item">DATA BREACH MONITOR ACTIVE</span>
-      <span class="ticker-item">TOR/VPN DETECTION ENABLED</span>
-      <span class="ticker-item">VAJAR-INTEL-BOT ACTIVE</span>
-      <span class="ticker-item">IP FORENSIC SYSTEM ONLINE</span>
-      <span class="ticker-item">OSINT ENGINE READY</span>
-      <span class="ticker-item">THREAT INTELLIGENCE FEED LIVE</span>
-      <span class="ticker-item">AUTHORIZED PERSONNEL ONLY</span>
-      <span class="ticker-item">DATA BREACH MONITOR ACTIVE</span>
-      <span class="ticker-item">TOR/VPN DETECTION ENABLED</span>
-    </div>
+  <div class="hmain">
+    <span class="ht">THE</span>
+    <span class="hc">CYBER</span>
+    <span class="hi">INDIA</span>
   </div>
 
-  <!-- PRODUCTS -->
-  <section id="products">
-    <div class="section-label">// CORE TOOLKIT</div>
-    <h2 class="section-title">Intelligence <span>Tools</span></h2>
-    <div class="section-divider"></div>
+  <div class="htool">Powered by &nbsp;<strong>VAJAR INTEL SYSTEM</strong>&nbsp; — Advanced Cyber Investigation Tools</div>
+  <div class="triline"></div>
+  <p class="htag">The wait for CDR is over — Get criminal intelligence in minutes, not days.</p>
 
-    <div class="products-grid reveal">
-      <!-- BOT -->
-      <div class="product-card blue">
-        <div class="card-corner"></div>
-        <div class="product-icon">🤖</div>
-        <div class="product-name">VAJAR-INTEL-BOT</div>
-        <div class="product-desc">
-          Telegram & CLI-based intelligence bot delivering instant OSINT profiles for law enforcement. No CDR required — get criminal intelligence in seconds.
+  <div class="hbtns">
+    <button class="bsaff" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">🚀 REQUEST ACCESS</button>
+    <button class="bgreen" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">🔍 VAJAR INTEL TOOLS</button>
+  </div>
+
+  <div class="hterm">
+    <div style="color:rgba(255,153,51,.45);font-size:.62rem;letter-spacing:3px;margin-bottom:.9rem;">◆ VAJAR INTEL — LIVE DEMO</div>
+    <span class="tp">root@thecyberindia:~$ </span><span style="color:#fff;">vajar-bot --osint "+91XXXXXXXXXX"</span>
+    <span class="to">⚡ Scanning target... India Mobile Intelligence</span>
+    <span class="to">✓ Operator : Airtel | Circle : UP East</span>
+    <span class="to">✓ OSINT Profile : FOUND (3 social accounts)</span>
+    <span class="tw">⚠ Breach Hit : 2 databases | Risk : HIGH</span>
+    <span class="to">✓ Report : case_20240916.pdf READY</span>
+    <span class="to">✅ Time : 4.3 seconds &nbsp;<span class="csr"></span></span>
+  </div>
+
+  <div class="hstats">
+    <div class="si"><div class="sn">2+</div><div class="sl">Intel Tools</div></div>
+    <div class="si"><div class="sn">&lt;10s</div><div class="sl">Response Time</div></div>
+    <div class="si"><div class="sn">24/7</div><div class="sl">Always Active</div></div>
+    <div class="si"><div class="sn">🇮🇳</div><div class="sl">Made in India</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-i">
+    <span class="ti s">◆ VAJAR INTEL BOT ONLINE</span>
+    <span class="ti w">◆ IP FORENSIC SYSTEM ACTIVE</span>
+    <span class="ti g">◆ OSINT ENGINE READY</span>
+    <span class="ti s">◆ MADE IN INDIA 🇮🇳</span>
+    <span class="ti w">◆ DATA BREACH MONITOR LIVE</span>
+    <span class="ti g">◆ TOR + VPN DETECTION ON</span>
+    <span class="ti s">◆ JAI HIND — DIGITAL INDIA</span>
+    <span class="ti w">◆ AUTHORIZED LEA ONLY</span>
+    <span class="ti g">◆ thecyberindia</span>
+    <span class="ti s">◆ VAJAR INTEL BOT ONLINE</span>
+    <span class="ti w">◆ IP FORENSIC SYSTEM ACTIVE</span>
+    <span class="ti g">◆ OSINT ENGINE READY</span>
+    <span class="ti s">◆ MADE IN INDIA 🇮🇳</span>
+    <span class="ti w">◆ DATA BREACH MONITOR LIVE</span>
+    <span class="ti g">◆ TOR + VPN DETECTION ON</span>
+    <span class="ti s">◆ JAI HIND — DIGITAL INDIA</span>
+    <span class="ti w">◆ AUTHORIZED LEA ONLY</span>
+    <span class="ti g">◆ thecyberindia</span>
+  </div>
+</div>
+
+<!-- FOUNDER -->
+<section id="founder">
+  <div class="sl2">// CREATOR & DEVELOPER</div>
+  <h2 class="st">Meet the <span>Builder</span></h2>
+  <div class="sdiv"></div>
+
+  <div class="fl reveal">
+    <div class="photocard">
+      <div class="avwrap">
+        <div class="avring"></div>
+        <div class="avinner">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="100" fill="#060e1a"/>
+            <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,153,51,0.1)" stroke-width="1"/>
+            <path d="M45 155 Q100 132 155 155 L160 200 L40 200Z" fill="#0a1828"/>
+            <path d="M78 140 L100 145 L122 140 L125 160 L100 158 L75 160Z" fill="#0d1f35"/>
+            <rect x="88" y="115" width="24" height="22" rx="5" fill="#152538"/>
+            <ellipse cx="100" cy="88" rx="40" ry="44" fill="#152538"/>
+            <path d="M60 76 Q64 48 100 44 Q136 48 140 76 L140 65 Q134 34 100 32 Q66 34 60 65Z" fill="#07101c"/>
+            <path d="M62 72 Q66 56 100 52 Q134 56 138 72Z" fill="#0b1a2c"/>
+            <ellipse cx="60" cy="88" rx="7" ry="10" fill="#122032"/>
+            <ellipse cx="140" cy="88" rx="7" ry="10" fill="#122032"/>
+            <path d="M53 82 Q54 72 60 70" stroke="rgba(255,153,51,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M147 82 Q146 72 140 70" stroke="rgba(255,153,51,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <rect x="53" y="82" width="14" height="14" rx="7" fill="none" stroke="rgba(255,153,51,0.6)" stroke-width="1.5"/>
+            <rect x="133" y="82" width="14" height="14" rx="7" fill="none" stroke="rgba(255,153,51,0.6)" stroke-width="1.5"/>
+            <ellipse cx="83" cy="87" rx="11" ry="9" fill="#060e1a"/>
+            <ellipse cx="117" cy="87" rx="11" ry="9" fill="#060e1a"/>
+            <ellipse cx="83" cy="87" rx="7" ry="6" fill="rgba(255,153,51,0.95)"/>
+            <ellipse cx="117" cy="87" rx="7" ry="6" fill="rgba(255,153,51,0.95)"/>
+            <circle cx="85" cy="85" r="2" fill="rgba(255,255,255,0.5)"/>
+            <circle cx="119" cy="85" r="2" fill="rgba(255,255,255,0.5)"/>
+            <path d="M73 79 Q83 76 93 79" stroke="rgba(200,216,232,0.4)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M107 79 Q117 76 127 79" stroke="rgba(200,216,232,0.4)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M96 95 Q100 101 104 95" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" fill="none"/>
+            <path d="M88 108 Q100 116 112 108" stroke="rgba(255,153,51,0.55)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <rect x="82" y="148" width="36" height="24" rx="1" fill="none" stroke="rgba(255,153,51,0.25)" stroke-width=".5"/>
+            <rect x="82" y="148" width="36" height="8" fill="rgba(255,153,51,0.25)"/>
+            <rect x="82" y="156" width="36" height="8" fill="rgba(255,255,255,0.08)"/>
+            <rect x="82" y="164" width="36" height="8" fill="rgba(19,136,8,0.25)"/>
+            <circle cx="100" cy="160" r="3.5" fill="none" stroke="rgba(0,0,128,0.5)" stroke-width=".6"/>
+            <rect x="60" y="0" width="80" height="1.5" fill="rgba(255,153,51,0.4)" opacity="0.6">
+              <animateTransform attributeName="transform" type="translate" from="0,0" to="0,200" dur="2.5s" repeatCount="indefinite"/>
+            </rect>
+          </svg>
         </div>
-        <ul class="feature-list">
-          <li><span class="feat-dot"></span>Phone Number OSINT Lookup</li>
-          <li><span class="feat-dot"></span>Email Address Tracking</li>
-          <li><span class="feat-dot"></span>Social Media Footprint Extraction</li>
-          <li><span class="feat-dot"></span>Data Breach Cross-Reference</li>
-          <li><span class="feat-dot"></span>Instant Suspect Profiling</li>
-          <li><span class="feat-dot"></span>Digital Identity Mapping</li>
+      </div>
+      <div class="fname">HARIOM SINGH</div>
+      <div class="frole">// CYBERSECURITY RESEARCHER & OSINT EXPERT</div>
+      <div class="fsocial">
+        <a href="https://youtube.com/@thecyberindia" class="sp yt" target="_blank">▶ YouTube</a>
+        <a href="https://instagram.com/thecyberindia" class="sp ig" target="_blank">📸 Instagram</a>
+        <a href="https://github.com/mrcyb4r" class="sp gh" target="_blank">⌥ GitHub</a>
+      </div>
+      <div class="fcontact">
+        📍 Deoria, Uttar Pradesh, India<br/>
+        📧 hariomsingh2706@gmail.com<br/>
+        📱 +91 8471071845
+      </div>
+    </div>
+
+    <div>
+      <p class="fbio"><strong>Hariom Singh</strong> is a cybersecurity researcher and OSINT specialist from Uttar Pradesh, India. Former CTO at <strong>Invisintel Technologies Pvt. Ltd.</strong>, he has built custom digital investigation tools that are actively used by Cyber Cell units.</p>
+      <p class="fbio">His flagship tool — <strong>VAJAR INTEL SYSTEM</strong> — solves the CDR delay problem, giving law enforcement <strong>instant digital intelligence</strong> to trace criminals before they escape.</p>
+      <p class="fbio">Founder of <strong style="color:var(--green)">thecyberindia</strong> — India's cyber investigation awareness platform on YouTube &amp; Instagram. Currently pursuing BCA with a specialization in AI-assisted cyber investigation.</p>
+      <div style="font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:3px;color:var(--saffron);margin-bottom:1rem;">// CERTIFICATIONS</div>
+      <div class="certlist">
+        <div class="crow"><div class="ctag">DCCI</div><div><div class="cname">Defronix Certified Cybercrime Investigator</div><div class="corg">Defronix Cyber Security · 2024</div></div></div>
+        <div class="crow"><div class="ctag">DCJSP</div><div><div class="cname">Cyber Justice & Security Practices</div><div class="corg">Defronix Cyber Security · 2024</div></div></div>
+        <div class="crow"><div class="ctag">INTERN</div><div><div class="cname">Cybercrime Investigation Internship</div><div class="corg">Defronix Cyber Security · Oct–Nov 2024</div></div></div>
+        <div class="crow"><div class="ctag">CCC</div><div><div class="cname">Course on Computer Concepts — NIELIT</div><div class="corg">NIELIT · 2023</div></div></div>
+        <div class="crow"><div class="ctag">PYTHON</div><div><div class="cname">Python Programming Certification</div><div class="corg">OM Astral Foundation · 2023</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="sl2">// VAJAR INTEL — CORE TOOLS</div>
+  <h2 class="st">Our <span class="s">Investigation</span> Tools</h2>
+  <div class="sdiv"></div>
+
+  <div class="pduo reveal">
+    <!-- BOT -->
+    <div class="pc">
+      <div class="pcstripe"></div>
+      <div class="pcbody">
+        <div class="illus">
+          <div class="bot">
+            <div class="bant"></div>
+            <div class="bhead">
+              <div class="beyes"><div class="beye"></div><div class="beye b"></div></div>
+              <div class="bmouth"></div>
+            </div>
+            <div class="bbody"></div>
+            <div class="bdata">
+              <div>OSINT: ████ 98%</div>
+              <div>SCAN : ███ 82%</div>
+              <div>AI   : ██  74%</div>
+            </div>
+            <div class="bsig" style="position:absolute;right:8px;top:20px;">
+              <div class="bs" style="height:5px;opacity:.4;"></div>
+              <div class="bs" style="height:9px;opacity:.7;"></div>
+              <div class="bs" style="height:13px;opacity:1;animation:ep 1.5s infinite alternate;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="pname">VAJAR-INTEL-BOT</div>
+        <div class="ptag">// TELEGRAM + CLI INTELLIGENCE AGENT</div>
+        <p class="pdesc">India's first AI-powered cybercrime investigation bot. Provide a phone number, email, or social link — and get a complete digital profile of the suspect instantly.</p>
+        <ul class="plist">
+          <li><span class="pb"></span>Phone Number OSINT Lookup (India)</li>
+          <li><span class="pb"></span>Email Address Deep Tracking</li>
+          <li><span class="pb"></span>Social Media Footprint Extraction</li>
+          <li><span class="pb"></span>Data Breach Cross-Reference</li>
+          <li><span class="pb"></span>AI-Based Suspect Profiling</li>
+          <li><span class="pb"></span>Instant Investigation Report</li>
         </ul>
       </div>
+    </div>
 
-      <!-- IP FORENSIC -->
-      <div class="product-card red">
-        <div class="card-corner"></div>
-        <div class="product-icon">🛰️</div>
-        <div class="product-name">VAJAR IP FORENSIC</div>
-        <div class="product-desc">
-          Advanced IP investigation software using STUN protocol techniques to reveal real network identities — even behind NAT, proxy layers and anonymizers.
+    <!-- IP FORENSIC -->
+    <div class="pc gc">
+      <div class="pcstripe"></div>
+      <div class="pcbody">
+        <div class="illus">
+          <div class="ips">
+            <div class="ic1"></div>
+            <div class="ic2"></div>
+            <div class="ic3">IP</div>
+            <div class="iddot" style="top:4px;left:77px;background:var(--green);box-shadow:0 0 10px var(--green);"></div>
+            <div class="iddot" style="bottom:4px;left:77px;background:var(--saffron);box-shadow:0 0 10px var(--saffron);"></div>
+            <div class="iddot" style="top:77px;left:4px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5);"></div>
+            <div class="iddot" style="top:77px;right:4px;background:var(--green);box-shadow:0 0 10px var(--green);"></div>
+            <div style="position:absolute;top:50%;left:50%;width:75px;height:1px;background:linear-gradient(90deg,var(--green),transparent);transform:rotate(45deg);transform-origin:0 50%;"></div>
+            <div style="position:absolute;top:50%;left:50%;width:60px;height:1px;background:linear-gradient(90deg,var(--saffron),transparent);transform:rotate(200deg);transform-origin:0 50%;"></div>
+            <div class="ipdata">
+              <div>103.xx.xx ✓</div>
+              <div>VPN: YES</div>
+              <div>TOR: NO</div>
+              <div>ISP: Jio</div>
+            </div>
+          </div>
         </div>
-        <ul class="feature-list">
-          <li><span class="feat-dot"></span>Real IP Detection via STUN Protocol</li>
-          <li><span class="feat-dot"></span>ISP + ASN Network Mapping</li>
-          <li><span class="feat-dot"></span>Threat Intelligence Integration</li>
-          <li><span class="feat-dot"></span>TOR Exit Node Detection</li>
-          <li><span class="feat-dot"></span>VPN Fingerprinting</li>
-          <li><span class="feat-dot"></span>Court-Ready Report Export</li>
+        <div class="pname">VAJAR IP FORENSIC</div>
+        <div class="ptag">// STUN PROTOCOL NETWORK INTELLIGENCE</div>
+        <p class="pdesc">Advanced IP investigation software — uses STUN protocol techniques to uncover a criminal's real IP address, even if they are behind a VPN or proxy.</p>
+        <ul class="plist">
+          <li><span class="pb"></span>Real IP Detection via STUN Protocol</li>
+          <li><span class="pb"></span>ISP + ASN Network Mapping</li>
+          <li><span class="pb"></span>Threat Intelligence Integration</li>
+          <li><span class="pb"></span>TOR Exit Node Detection</li>
+          <li><span class="pb"></span>VPN / Proxy Fingerprinting</li>
+          <li><span class="pb"></span>Court-Ready PDF Export</li>
         </ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- WHY VAJAR -->
-  <section id="why">
-    <div class="section-label">// PROBLEM & SOLUTION</div>
-    <h2 class="section-title">Why <span>VAJAR</span>?</h2>
-    <div class="section-divider"></div>
-
-    <div class="why-grid reveal">
-      <div class="why-card prob">
-        <div class="why-title">❌ CURRENT PROBLEMS</div>
-        <div class="why-items">
-          <div class="why-item">🕐 <span>CDR (Call Detail Records) take days or weeks to arrive</span></div>
-          <div class="why-item">🏃 <span>Criminals escape before investigation completes</span></div>
-          <div class="why-item">📋 <span>Manual OSINT is slow, unreliable and incomplete</span></div>
-          <div class="why-item">🌐 <span>VPN/proxy users hide their real identity easily</span></div>
-          <div class="why-item">📁 <span>No centralized digital evidence management</span></div>
-        </div>
-      </div>
-
-      <div class="vs-divider">VS</div>
-
-      <div class="why-card sol">
-        <div class="why-title">✅ VAJAR SOLUTION</div>
-        <div class="why-items">
-          <div class="why-item">⚡ <span>Instant intelligence — zero waiting time</span></div>
-          <div class="why-item">🎯 <span>Real-time suspect identification & profiling</span></div>
-          <div class="why-item">🤖 <span>AI-assisted automated OSINT collection</span></div>
-          <div class="why-item">🔍 <span>Advanced IP detection through network layers</span></div>
-          <div class="why-item">📄 <span>Auto-generated investigation-ready reports</span></div>
-        </div>
+<!-- WHY -->
+<section id="why">
+  <div class="sl2">// THE PROBLEM WE SOLVE</div>
+  <h2 class="st">Why <span>VAJAR</span> Intel?</h2>
+  <div class="sdiv"></div>
+  <div class="wgrid reveal">
+    <div class="wcol prob">
+      <div class="whead">❌ THE OLD PROBLEM</div>
+      <div class="witems">
+        <div class="wi">🕐 <span>CDR takes 15–30 days to arrive</span></div>
+        <div class="wi">🏃 <span>By then, the criminal has already escaped</span></div>
+        <div class="wi">🌐 <span>VPN/proxy users remain completely invisible</span></div>
+        <div class="wi">📋 <span>Manual OSINT takes 10–12 hours of work</span></div>
+        <div class="wi">📁 <span>Evidence is not in court-ready format</span></div>
       </div>
     </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section id="howitworks">
-    <div class="section-label">// INVESTIGATION FLOW</div>
-    <h2 class="section-title">How It <span>Works</span></h2>
-    <div class="section-divider"></div>
-
-    <div class="steps-container">
-      <div class="steps-line"></div>
-
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <div class="step-title">INPUT SUSPECT DATA</div>
-          <div class="step-desc">Provide phone number, email address, social media link, or IP address. VAJAR accepts any digital identifier as entry point.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <div class="step-title">OSINT INTELLIGENCE EXTRACTION</div>
-          <div class="step-desc">VAJAR-INTEL-BOT automatically scans multiple OSINT sources, social platforms, and breach databases to build a complete digital profile.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <div class="step-title">IP NETWORK ANALYSIS</div>
-          <div class="step-desc">VAJAR IP Forensic Software runs deep network analysis — detecting real IPs, identifying ISP/ASN data, flagging VPN usage and TOR activity.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">04</div>
-        <div class="step-content">
-          <div class="step-title">AI THREAT ASSESSMENT</div>
-          <div class="step-desc">Integrated AI engine analyzes patterns, correlates data points, assigns threat scores, and flags suspicious behavioral indicators.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">05</div>
-        <div class="step-content">
-          <div class="step-title">INVESTIGATION REPORT GENERATED</div>
-          <div class="step-desc">Complete case file generated automatically — formatted for law enforcement use with all evidence, findings, and digital chain-of-custody documentation.</div>
-        </div>
+    <div class="vsm">V<br/>S</div>
+    <div class="wcol sol">
+      <div class="whead">✅ VAJAR INTEL SOLUTION</div>
+      <div class="witems">
+        <div class="wi">⚡ <span>Complete intel report in 10 seconds</span></div>
+        <div class="wi">🎯 <span>Real-time suspect trace — zero delay</span></div>
+        <div class="wi">🔍 <span>Real IP detected via STUN — VPN bypass</span></div>
+        <div class="wi">🤖 <span>AI-automated OSINT — one click</span></div>
+        <div class="wi">📄 <span>Auto-generated court-ready investigation PDF</span></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FEATURES -->
-  <section id="features">
-    <div class="section-label">// CAPABILITIES</div>
-    <h2 class="section-title">Platform <span>Features</span></h2>
-    <div class="section-divider"></div>
+<!-- HOW IT WORKS -->
+<section id="hiw">
+  <div class="sl2">// INVESTIGATION WORKFLOW</div>
+  <h2 class="st">How Does It <span>Work</span>?</h2>
+  <div class="sdiv"></div>
+  <div class="swrap">
+    <div class="strack"></div>
+    <div class="sitem"><div class="sno">01</div><div class="scnt"><div class="stitle">SUSPECT DATA INPUT</div><div class="sdesc">Enter a phone number, email, IP address, or social link — any digital identifier. VAJAR can begin from any entry point.</div></div></div>
+    <div class="sitem"><div class="sno">02</div><div class="scnt"><div class="stitle">VAJAR-BOT OSINT SCAN</div><div class="sdesc">The bot automatically scans multiple OSINT sources, social platforms, and breach databases — building a complete digital profile in seconds.</div></div></div>
+    <div class="sitem"><div class="sno">03</div><div class="scnt"><div class="stitle">IP NETWORK FORENSICS</div><div class="sdesc">VAJAR IP Forensic performs deep network analysis — detects real IP, maps ISP/ASN, flags VPN usage, and identifies TOR activity.</div></div></div>
+    <div class="sitem"><div class="sno">04</div><div class="scnt"><div class="stitle">AI THREAT ASSESSMENT</div><div class="sdesc">Integrated AI analyzes patterns, correlates data, assigns a threat score, and flags suspicious activity automatically.</div></div></div>
+    <div class="sitem"><div class="sno">05</div><div class="scnt"><div class="stitle">REPORT READY — TAKE ACTION</div><div class="sdesc">A complete case file is auto-generated in law enforcement format — with all evidence and a full digital chain-of-custody. Ready for direct court submission.</div></div></div>
+  </div>
+</section>
 
-    <div class="features-grid reveal">
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <div class="feature-name">Instant Intelligence</div>
-        <div class="feature-desc">Zero CDR dependency. Get actionable intelligence on suspects within seconds, not days.</div>
+<!-- FEATURES -->
+<section id="features">
+  <div class="sl2">// PLATFORM CAPABILITIES</div>
+  <h2 class="st">What <span class="s">Features</span> Are Available?</h2>
+  <div class="sdiv"></div>
+  <div class="fgrid reveal">
+    <div class="fcard"><div class="fic">⚡</div><div class="fn">Instant Intelligence</div><div class="fd">Zero CDR dependency. Actionable intel in seconds — not days. India's fastest investigation tool.</div></div>
+    <div class="fcard"><div class="fic">🧠</div><div class="fn">AI Threat Detection</div><div class="fd">Machine learning automatically flags suspicious IPs, VPN exits, and criminal patterns.</div></div>
+    <div class="fcard"><div class="fic">🇮🇳</div><div class="fn">India-First Design</div><div class="fd">Specifically optimized for Indian mobile operators, ISPs, and the digital ecosystem — built for Bharat.</div></div>
+    <div class="fcard"><div class="fic">🌐</div><div class="fn">OSINT Deep Scan</div><div class="fd">Multi-source intelligence — social media, public records, breach databases — all in one place.</div></div>
+    <div class="fcard"><div class="fic">🧾</div><div class="fn">Auto Investigation Reports</div><div class="fd">Court-admissible documentation auto-generated — complete evidence chain, timestamps, digital forensics.</div></div>
+    <div class="fcard"><div class="fic">🔐</div><div class="fn">LEA Exclusive</div><div class="fd">Available only to verified police units and authorized cyber investigators — with strict access control.</div></div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section id="usecases">
+  <div class="sl2">// APPLICATIONS</div>
+  <h2 class="st">Where Is It <span>Used</span>?</h2>
+  <div class="sdiv"></div>
+  <div class="ucgrid reveal">
+    <div class="uc"><div class="ucic">💳</div><div class="uct">Cyber Fraud Investigation</div></div>
+    <div class="uc"><div class="ucic">🎣</div><div class="uct">Phishing & Scam Tracking</div></div>
+    <div class="uc"><div class="ucic">👤</div><div class="uct">Impersonation & Fake Account</div></div>
+    <div class="uc"><div class="ucic">🌑</div><div class="uct">Dark Web Activity Monitor</div></div>
+    <div class="uc"><div class="ucic">🔍</div><div class="uct">Missing Person Digital Trace</div></div>
+  </div>
+</section>
+
+<!-- MEDIA -->
+<section id="media">
+  <div class="sl2">// FOLLOW ON SOCIAL MEDIA</div>
+  <h2 class="st"><span class="s">the</span><span>cyberindia</span></h2>
+  <div class="sdiv"></div>
+  <div class="mgrid reveal">
+    <a href="https://youtube.com/@thecyberindia" target="_blank" class="mc">
+      <div class="mic">▶️</div>
+      <div><div class="mplt">YOUTUBE</div><div class="mhnd">@thecyberindia</div><div class="msub">Investigation demos • Tool walkthroughs • Cyber cases</div></div>
+    </a>
+    <a href="https://instagram.com/thecyberindia" target="_blank" class="mc">
+      <div class="mic">📸</div>
+      <div><div class="mplt">INSTAGRAM</div><div class="mhnd">@thecyberindia</div><div class="msub">Live tracing reels • Cyber tips • Tool demos</div></div>
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sl2">// AUTHORIZED ACCESS REQUEST</div>
+  <h2 class="st">Request <span class="s">Access</span></h2>
+  <div class="sdiv"></div>
+  <div class="cwrap">
+    <div class="cwarning">🚨&nbsp;&nbsp;RESTRICTED: VAJAR INTEL tools are available only for verified law enforcement agencies and authorized cyber investigators. Upon submission, your request will be sent directly to Hariom Singh via WhatsApp notification.</div>
+    <div class="cf">
+      <div class="cfrow">
+        <div class="cfg"><label class="cflbl">Full Name</label><input class="cfi" type="text" placeholder="Officer / Investigator name" id="f1"/></div>
+        <div class="cfg"><label class="cflbl">Badge / ID Number</label><input class="cfi" type="text" placeholder="Official Badge or ID No." id="f2"/></div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧠</div>
-        <div class="feature-name">AI Threat Detection</div>
-        <div class="feature-desc">Machine learning-powered anomaly detection flags suspicious IPs, VPN exits, and behavioral patterns.</div>
+      <div class="cfrow">
+        <div class="cfg"><label class="cflbl">Department / Organization</label><input class="cfi" type="text" placeholder="e.g. UP Police Cyber Cell" id="f3"/></div>
+        <div class="cfg"><label class="cflbl">Official Contact / Email</label><input class="cfi" type="text" placeholder="+91XXXXXXXXXX or official email" id="f4"/></div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🌐</div>
-        <div class="feature-name">OSINT Deep Scan</div>
-        <div class="feature-desc">Multi-source intelligence aggregation across social media, public records, and breach databases.</div>
+      <div class="cfg"><label class="cflbl">Tool Required</label>
+        <select class="cfs" id="f5">
+          <option value="">-- Select Tool --</option>
+          <option>VAJAR-INTEL-BOT (Telegram/CLI)</option>
+          <option>VAJAR IP Forensic Software</option>
+          <option>Both Tools — Full Package</option>
+          <option>Demo Request Only</option>
+        </select>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📍</div>
-        <div class="feature-name">IP Location Tracking</div>
-        <div class="feature-desc">Precise geolocation with ISP mapping, ASN data, and network infrastructure identification.</div>
+      <div class="cfg"><label class="cflbl">Investigation Purpose / Case Type</label>
+        <textarea class="cft" placeholder="Briefly describe — what type of investigation do you need this for..." id="f6"></textarea>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧾</div>
-        <div class="feature-name">Auto Investigation Reports</div>
-        <div class="feature-desc">Court-admissible documentation generated automatically with complete evidence chain and timestamps.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔐</div>
-        <div class="feature-name">Law Enforcement Focused</div>
-        <div class="feature-desc">Designed exclusively for verified police units and authorized cyber investigation agencies.</div>
-      </div>
+      <button class="cfsub" onclick="submitForm()">🇮🇳 &nbsp; SUBMIT ACCESS REQUEST — WHATSAPP NOTIFICATION</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- USE CASES -->
-  <section id="usecases">
-    <div class="section-label">// APPLICATIONS</div>
-    <h2 class="section-title">Use <span>Cases</span></h2>
-    <div class="section-divider"></div>
-
-    <div class="usecases-grid reveal">
-      <div class="usecase-card">
-        <div class="usecase-icon">💳</div>
-        <div class="usecase-title">Cyber Fraud Investigation</div>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-icon">🎣</div>
-        <div class="usecase-title">Phishing & Scam Tracking</div>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-icon">👤</div>
-        <div class="usecase-title">Impersonation Cases</div>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-icon">🌑</div>
-        <div class="usecase-title">Dark Web Activity</div>
-      </div>
-      <div class="usecase-card">
-        <div class="usecase-icon">🔍</div>
-        <div class="usecase-title">Missing Person Digital Trace</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SOCIAL PROOF -->
-  <section id="social">
-    <div class="section-label">// MEDIA & RESOURCES</div>
-    <h2 class="section-title">Follow <span>thecyberindia</span></h2>
-    <div class="section-divider"></div>
-
-    <div class="social-grid reveal">
-      <a href="https://youtube.com/@thecyberindia" target="_blank" class="social-card" style="text-decoration:none;color:inherit;">
-        <div class="social-icon">▶️</div>
-        <div>
-          <div class="social-name">YouTube</div>
-          <div class="social-handle">@thecyberindia</div>
-          <div class="social-sub">Investigation demos • Tool walkthroughs • Case studies</div>
-        </div>
-      </a>
-      <a href="https://instagram.com/thecyberindia" target="_blank" class="social-card" style="text-decoration:none;color:inherit;">
-        <div class="social-icon">📸</div>
-        <div>
-          <div class="social-name">Instagram</div>
-          <div class="social-handle">@thecyberindia</div>
-          <div class="social-sub">Live tracing demos • Cyber tips • Reels</div>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <!-- CREDENTIALS -->
-  <section id="credentials">
-    <div class="section-label">// DEVELOPER PROFILE</div>
-    <h2 class="section-title">Built By An <span>Expert</span></h2>
-    <div class="section-divider"></div>
-
-    <div class="cred-grid reveal">
-      <div class="cred-left">
-        <div class="cred-name">HARIOM SINGH</div>
-        <div class="cred-role">// CYBERSECURITY RESEARCHER & OSINT SPECIALIST</div>
-        <br/>
-        <p class="cred-bio">
-          Former CTO at Invisintel Technologies Pvt. Ltd., Hariom Singh is a cybersecurity professional specializing in Cybercrime Investigation, Digital Forensics, and OSINT. He has developed custom investigation tools actively used by Cyber Cell units — including the STUN IP Investigation Software GUI.
-        </p>
-        <p class="cred-bio">
-          Currently pursuing BCA with a focus on AI-assisted cyber investigations. Founder of <strong style="color:var(--blue)">thecyberindia</strong> — a platform dedicated to empowering law enforcement with next-generation digital intelligence tools.
-        </p>
-      </div>
-      <div class="cred-right">
-        <div class="certs">
-          <div class="cert-item">
-            <div class="cert-badge">DCCI</div>
-            <div>
-              <div class="cert-name">Defronix Certified Cybercrime Investigator</div>
-              <div class="cert-org">Defronix Cyber Security · 2024</div>
-            </div>
-          </div>
-          <div class="cert-item">
-            <div class="cert-badge">DCJSP</div>
-            <div>
-              <div class="cert-name">Cyber Justice & Security Practices</div>
-              <div class="cert-org">Defronix Cyber Security · 2024</div>
-            </div>
-          </div>
-          <div class="cert-item">
-            <div class="cert-badge">CCC</div>
-            <div>
-              <div class="cert-name">Course on Computer Concepts</div>
-              <div class="cert-org">NIELIT · 2023</div>
-            </div>
-          </div>
-          <div class="cert-item">
-            <div class="cert-badge">PY</div>
-            <div>
-              <div class="cert-name">Python Programming Certification</div>
-              <div class="cert-org">OM Astral Foundation · 2023</div>
-            </div>
-          </div>
-          <div class="cert-item">
-            <div class="cert-badge">INT</div>
-            <div>
-              <div class="cert-name">Cybercrime Investigation Internship</div>
-              <div class="cert-org">Defronix Cyber Security · Oct–Nov 2024</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="section-label">// AUTHORIZED ACCESS REQUEST</div>
-    <h2 class="section-title">Request <span>Access</span></h2>
-    <div class="section-divider"></div>
-
-    <div class="contact-wrapper">
-      <div class="contact-warning">
-        ⚠️ &nbsp; RESTRICTED ACCESS — VAJAR INTEL TOOLS ARE EXCLUSIVELY AVAILABLE TO VERIFIED LAW ENFORCEMENT AGENCIES AND AUTHORIZED PERSONNEL ONLY.
-      </div>
-
-      <div class="contact-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Full Name</label>
-            <input class="form-input" type="text" placeholder="Officer / Investigator Name" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Badge / ID Number</label>
-            <input class="form-input" type="text" placeholder="Official ID" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Department / Organization</label>
-            <input class="form-input" type="text" placeholder="e.g. UP Police Cyber Cell" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Official Email</label>
-            <input class="form-input" type="email" placeholder="official@police.gov.in" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Tool Required</label>
-          <select class="form-select">
-            <option value="">Select Tool</option>
-            <option>VAJAR-INTEL-BOT (Telegram/CLI)</option>
-            <option>VAJAR IP Forensic Software</option>
-            <option>Both Tools</option>
-            <option>Request Demo Only</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Case / Investigation Purpose</label>
-          <textarea class="form-textarea" placeholder="Briefly describe the use case or investigation type..."></textarea>
-        </div>
-
-        <button class="form-submit" onclick="handleSubmit()">
-          ⚡ SUBMIT ACCESS REQUEST
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-grid">
+<!-- FOOTER -->
+<footer>
+  <div class="ftri"></div>
+  <div class="finner">
+    <div class="ftop">
       <div>
-        <div class="footer-logo">VAJAR<span>.</span>INTEL</div>
-        <p class="footer-bio">
-          AI-powered cybercrime investigation tools built for law enforcement. Instant OSINT intelligence, IP forensics, and digital evidence generation — empowering police to catch criminals faster.
-        </p>
-        <br/>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(0,170,255,0.5);">
-          📧 hariomsingh2706@gmail.com<br/>
-          📱 +91-8052383684<br/>
-          🌐 thecyberindia.vercel.app
-        </div>
+        <div class="fblogo"><span class="ft">THE</span><span class="fc">CYBER</span><span class="fi">INDIA</span></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(255,153,51,.4);letter-spacing:2px;margin-top:.2rem;">Powered by VAJAR INTEL SYSTEM</div>
+        <div class="fbtag">India's Digital Security Shield.<br/>AI-powered cybercrime investigation — Instant OSINT • IP Forensics • Auto Reports<br/>🇮🇳 Made in India &nbsp;|&nbsp; Jai Hind</div>
+        <div class="fbcont">📧 <a href="mailto:hariomsingh2706@gmail.com">hariomsingh2706@gmail.com</a><br/>📱 <a href="tel:+918471071845">+91 8471071845</a><br/>🌐 thecyberindia.com</div>
       </div>
       <div>
-        <div class="footer-col-title">// TOOLS</div>
-        <ul class="footer-links">
+        <div class="fch">// VAJAR TOOLS</div>
+        <ul class="flinks">
           <li><a href="#products">VAJAR-INTEL-BOT</a></li>
           <li><a href="#products">VAJAR IP Forensic</a></li>
-          <li><a href="#howitworks">How It Works</a></li>
+          <li><a href="#hiw">How It Works</a></li>
           <li><a href="#features">Features</a></li>
+          <li><a href="#usecases">Use Cases</a></li>
         </ul>
       </div>
       <div>
-        <div class="footer-col-title">// CONNECT</div>
-        <ul class="footer-links">
-          <li><a href="https://youtube.com/@thecyberindia" target="_blank">YouTube: thecyberindia</a></li>
-          <li><a href="https://instagram.com/thecyberindia" target="_blank">Instagram: thecyberindia</a></li>
-          <li><a href="https://github.com/mrcyb4r" target="_blank">GitHub: mrcyb4r</a></li>
-          <li><a href="https://linkedin.com/in/hariom-singh-" target="_blank">LinkedIn</a></li>
-          <li><a href="#contact">Request Access</a></li>
+        <div class="fch">// CONNECT</div>
+        <ul class="flinks">
+          <li><a href="https://youtube.com/@thecyberindia" target="_blank">▶ YouTube: thecyberindia</a></li>
+          <li><a href="https://instagram.com/thecyberindia" target="_blank">📸 Instagram: thecyberindia</a></li>
+          <li><a href="https://github.com/mrcyb4r" target="_blank">⌥ GitHub: mrcyb4r</a></li>
+          <li><a href="https://linkedin.com/in/hariom-singh-" target="_blank">🔗 LinkedIn</a></li>
+          <li><a href="#contact">📋 Request Access</a></li>
         </ul>
       </div>
     </div>
-
-    <div class="footer-bottom">
-      <div>© 2024 VAJAR INTEL SYSTEM · thecyberindia · All Rights Reserved</div>
-      <div style="color:var(--red);">⚠️ FOR AUTHORIZED LAW ENFORCEMENT USE ONLY</div>
+    <div class="fbot">
+      <div>© 2024–2025 thecyberindia | VAJAR INTEL SYSTEM | All Rights Reserved</div>
+      <div><span class="jai">🇮🇳 JAI HIND</span> &nbsp;|&nbsp; FOR AUTHORIZED LAW ENFORCEMENT ONLY</div>
     </div>
-  </footer>
+  </div>
+</footer>
 
-  <script>
-    // SCROLL REVEAL
-    const reveals = document.querySelectorAll('.reveal, .step');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), 100);
-        }
-      });
-    }, { threshold: 0.1 });
+<script>
+function submitForm(){
+  const v=id=>document.getElementById(id).value.trim();
+  const name=v('f1'),badge=v('f2'),dept=v('f3'),contact=v('f4'),tool=v('f5'),purpose=v('f6');
+  if(!name||!dept||!tool){alert('Please fill in Name, Department, and Tool selection.');return;}
+  const msg=
+    `🚨 *NEW VAJAR INTEL ACCESS REQUEST*\n\n`+
+    `👤 *Name:* ${name}\n`+
+    `🔖 *Badge/ID:* ${badge||'N/A'}\n`+
+    `🏢 *Department:* ${dept}\n`+
+    `📞 *Contact:* ${contact||'N/A'}\n`+
+    `🛠 *Tool:* ${tool}\n`+
+    `📋 *Purpose:* ${purpose||'N/A'}\n\n`+
+    `_thecyberindia | VAJAR INTEL SYSTEM_\n🇮🇳 Jai Hind`;
+  window.open(`https://wa.me/918471071845?text=${encodeURIComponent(msg)}`,'_blank');
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),5000);
+  ['f1','f2','f3','f4','f5','f6'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.tagName==='SELECT'?(el.value=''):(el.value='');
+  });
+  document.getElementById('f5').selectedIndex=0;
+}
 
-    reveals.forEach(el => observer.observe(el));
+const ro=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
-    // STAGGERED STEPS
-    const steps = document.querySelectorAll('.step');
-    const stepObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          steps.forEach((step, i) => {
-            setTimeout(() => step.classList.add('visible'), i * 150);
-          });
-        }
-      });
-    }, { threshold: 0.2 });
+const so=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)document.querySelectorAll('.sitem').forEach((s,i)=>setTimeout(()=>s.classList.add('vis'),i*160));}),{threshold:.1});
+const fs=document.querySelector('.sitem');
+if(fs)so.observe(fs.parentElement);
 
-    if (steps[0]) stepObserver.observe(steps[0].parentElement);
-
-    // FORM SUBMIT
-    function handleSubmit() {
-      const btn = document.querySelector('.form-submit');
-      btn.textContent = '✓ REQUEST SUBMITTED — VERIFICATION PENDING';
-      btn.style.background = 'linear-gradient(90deg, #004422, #006633)';
-      btn.style.boxShadow = '0 0 30px rgba(0,255,136,0.3)';
-    }
-
-    // NAV ACTIVE STATE
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('nav');
-      if (window.scrollY > 50) {
-        nav.style.background = 'rgba(2,5,8,0.98)';
-      } else {
-        nav.style.background = 'rgba(2,5,8,0.92)';
-      }
-    });
-
-    // PARTICLE EFFECT (subtle)
-    const canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4;';
-    document.body.appendChild(canvas);
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = Array.from({length: 60}, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.5 + 0.5,
-      c: Math.random() > 0.5 ? '0,170,255' : '255,34,68',
-    }));
-
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.c},0.6)`;
-        ctx.fill();
-      });
-
-      // draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i+1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0,170,255,${0.1 * (1 - dist/100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(animateParticles);
-    }
-
-    animateParticles();
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-  </script>
-
+const cv=document.createElement('canvas');
+cv.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+document.body.appendChild(cv);
+const cx=cv.getContext('2d');
+cv.width=innerWidth;cv.height=innerHeight;
+const CC=['255,153,51','19,136,8','200,216,232'];
+const PP=Array.from({length:60},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:Math.random()*1.1+.4,c:CC[Math.floor(Math.random()*CC.length)]}));
+function animate(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  PP.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=`rgba(${p.c},.45)`;cx.fill();});
+  for(let i=0;i<PP.length;i++)for(let j=i+1;j<PP.length;j++){
+    const dx=PP[i].x-PP[j].x,dy=PP[i].y-PP[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<105){cx.beginPath();cx.moveTo(PP[i].x,PP[i].y);cx.lineTo(PP[j].x,PP[j].y);cx.strokeStyle=`rgba(255,153,51,${.07*(1-d/105)})`;cx.lineWidth=.4;cx.stroke();}
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+addEventListener('resize',()=>{cv.width=innerWidth;cv.height=innerHeight;});
+</script>
 </body>
 </html>
